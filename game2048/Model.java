@@ -1,5 +1,6 @@
 package game2048;
 
+import java.security.cert.TrustAnchor;
 import java.util.Arrays;
 import java.util.Formatter;
 import java.util.Observable;
@@ -78,8 +79,15 @@ class Model extends Observable {
     boolean tilt(Side side) {
         boolean changed;
         changed = false;
+        for(int row = 0; row < Main.BOARD_SIZE; row++) {
+            int column_a = 0;
+            int column_b = 0
+//            merge (column_a,row) with (column_b,row)
+            while(tile(column, row) == null) {
+                column++;
+            }
 
-        // FIXME
+        }
 
         checkGameOver();
         if (changed) {
@@ -116,7 +124,31 @@ class Model extends Observable {
     /** Deternmine whether game is over and update _gameOver and _maxScore
      *  accordingly. */
     private void checkGameOver() {
-        // FIXME
+//        check whether there are empty spaces in the board
+        for(int i = 0; i < Main.BOARD_SIZE; i++) {
+            for(int j = 0; j < Main.BOARD_SIZE; j++) {
+                if (tile(i, j) == null) return;
+            }
+        }
+
+        /** If there are no empty spaces in the board, check whether there
+         * are adjacency tiles with same value.   */
+        for(int i = 0; i < Main.BOARD_SIZE; i++) {
+            for(int j = 0; j < Main.BOARD_SIZE - 1; j++) {
+                if (tile(i,j) == tile(i, j+1) ) {
+                    return;
+                }
+            }
+        }
+        for(int j = 0; j < Main.BOARD_SIZE; j++) {
+            for (int i = 0; i< Main.BOARD_SIZE -1; i++) {
+                if (tile(i,j) == tile(i+1, j)) {
+                    return;
+                }
+            }
+        }
+        _maxScore = _score;
+        _gameOver = true;
     }
 
     @Override
