@@ -77,16 +77,54 @@ class Model extends Observable {
 
     /** Tilt the board toward SIDE. Return true iff this changes the board. */
     boolean tilt(Side side) {
-        boolean changed;
-        changed = false;
-        for(int row = 0; row < Main.BOARD_SIZE; row++) {
-            int column_a = 0;
-            int column_b = 0
-//            merge (column_a,row) with (column_b,row)
-            while(tile(column, row) == null) {
-                column++;
+        boolean changed = false;
+        for(int x = 0; x < Main.BOARD_SIZE; x++) {
+//            step1, merge non-zero element
+            int y = 0;
+            while (y < Main.BOARD_SIZE) {
+                if (vtile(x, y, side) == null) {
+                    y++;
+                    continue;
+                }
+                int loc;
+//                find the next non-zero element
+                for(loc = y + 1; loc < Main.BOARD_SIZE; loc++ ) {
+                    if (vtile(x, loc, side) != null) break;
+                }
+//                didn't find any non-zero element, step1 ends
+                if (vtile(x, loc, side) == null) {
+                    setVtile(x, loc, side, vtile(x, y, side));
+                    changed = true;
+                    break;
+                }
+//                element found could be merged with board(x,y)
+                if (vtile(x, y, side).value() == vtile(x,loc, side).value()) {
+                    setVtile(x, loc, side, vtile(x, y, side));
+                    changed = true;
+                    y = loc + 1;
+                    continue;
+                }
+//                element found could not be merged with board(x,y), skip the current element
+                y = loc;
             }
 
+//            step2: remove all the blank space, from up to down
+            y = Main.BOARD_SIZE - 1;
+            while (y > 0) {
+                if (vtile(x, y, side) != null) {
+                    y--;
+                    continue;
+                }
+                int loc;
+                for(loc = y - 1; y >= 0; y--) {
+                    if (vtile(x, y, side) != null) {
+                        break;
+                    }
+                }
+                setVtile(x, y, side, vtile(x, loc, side));
+                changed = true;
+                y--;
+            }
         }
 
         checkGameOver();
