@@ -41,7 +41,7 @@ public class Game {
                     return;
                 case "New Game":
                     return;
-                case "Up": case "Down": case "Left": case "Right":
+                case "向上箭头": case "向下箭头": case "向左箭头": case "向右箭头":
                     if (!_model.gameOver() && _model.tilt(keyToSide(cmnd))) {
                         _model.notifyObservers();
                         moved = true;
@@ -59,13 +59,13 @@ public class Game {
      *  or "Right"). */
     private Side keyToSide(String key) {
         switch (key) {
-        case "Up":
+        case "向上箭头":
             return NORTH;
-        case "Down":
+        case "向下箭头":
             return SOUTH;
-        case "Left":
+        case "向左箭头":
             return WEST;
-        case "Right":
+        case "向右箭头":
             return EAST;
         default:
             throw new IllegalArgumentException("unknown key designation");
@@ -88,7 +88,7 @@ public class Game {
 
     /** Strings representing the four arrow keys. */
     private static final String[] ARROW_KEYS = {
-        "Up", "Down", "Left", "Right"
+        "向上箭头", "向下箭头", "向左箭头", "向右箭头"
     };
 
     /** The playing board. */

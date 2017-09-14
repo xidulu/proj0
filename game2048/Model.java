@@ -92,6 +92,9 @@ class Model extends Observable {
                     if (vtile(x, loc, side) != null) break;
                 }
 //                didn't find any non-zero element, step1 ends
+                if (loc == Main.BOARD_SIZE) {
+                    break;
+                }
                 if (vtile(x, loc, side) == null) {
                     setVtile(x, loc, side, vtile(x, y, side));
                     changed = true;
@@ -111,19 +114,27 @@ class Model extends Observable {
 //            step2: remove all the blank space, from up to down
             y = Main.BOARD_SIZE - 1;
             while (y > 0) {
+//                (x,y) is not empty , move down!
                 if (vtile(x, y, side) != null) {
                     y--;
                     continue;
                 }
+//                (x,y) is empty, find the first non-empty element and move it up
                 int loc;
-                for(loc = y - 1; y >= 0; y--) {
-                    if (vtile(x, y, side) != null) {
+                for(loc = y - 1; loc > 0; loc--) {
+                    if (vtile(x, loc, side) != null) {
                         break;
                     }
                 }
-                setVtile(x, y, side, vtile(x, loc, side));
-                changed = true;
-                y--;
+                if (vtile(x, loc, side) != null) {
+                    setVtile(x, y, side, vtile(x, loc, side));
+                    changed = true;
+                    y--;
+                    continue;
+                } else {
+//                  did not find any non-empty element below,step2 ends
+                    break;
+                }
             }
         }
 
@@ -137,7 +148,9 @@ class Model extends Observable {
     /** Return the current Tile at (COL, ROW), when sitting with the board
      *  oriented so that SIDE is at the top (farthest) from you. */
     private Tile vtile(int col, int row, Side side) {
+        if (_board[side.col(col, row, size())][side.row(col, row, size())] != null)
         return _board[side.col(col, row, size())][side.row(col, row, size())];
+        else return  null;
     }
 
     /** Move TILE to (COL, ROW), merging with any tile already there,
