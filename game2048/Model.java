@@ -79,38 +79,35 @@ class Model extends Observable {
     boolean tilt(Side side) {
         boolean changed = false;
         for(int x = 0; x < Main.BOARD_SIZE; x++) {
-//            step1, merge non-zero element
-            int y = 0;
-            while (y < Main.BOARD_SIZE) {
-                if (vtile(x, y, side) == null) {
-                    y++;
+//            step1, merge non-zero element, from up to down
+
+//            to be fixed, need to merged from up to down
+            int y = Main.BOARD_SIZE - 1;
+            while(true) {
+                if (y == 0) break;
+                if(vtile(x, y, side) == null) {
+                    y--;
                     continue;
                 }
-                int loc;
-//                find the next non-zero element
-                for(loc = y + 1; loc < Main.BOARD_SIZE; loc++ ) {
-                    if (vtile(x, loc, side) != null) break;
+//                board(x, y) is not empty;
+                boolean merged = false;
+                for (int loc = y - 1; loc >= 0; loc--) {
+                    if (vtile(x, loc, side)!= null ) {
+                        if(vtile(x, y, side).value() == vtile(x, loc, side).value()) {
+                            setVtile(x, y, side, vtile(x, loc, side));
+                            changed = true;
+                            _score += vtile(x, y, side).value();
+                            y--;
+                            merged = true;
+                            break;
+                        } else {
+                            break;
+                        }
+                    }
                 }
-//                didn't find any non-zero element, step1 ends
-                if (loc == Main.BOARD_SIZE) {
-                    break;
-                }
-                if (vtile(x, loc, side) == null) {
-                    setVtile(x, loc, side, vtile(x, y, side));
-                    changed = true;
-                    break;
-                }
-//                element found could be merged with board(x,y)
-                if (vtile(x, y, side).value() == vtile(x,loc, side).value()) {
-                    setVtile(x, loc, side, vtile(x, y, side));
-                    _score += vtile(x, loc, side).value();
-                    changed = true;
-                    y = loc + 1;
-                    continue;
-                }
-//                element found could not be merged with board(x,y), skip the current element
-                y = loc;
-            }
+                if (!merged) y--;
+             }
+
 
 //            step2: remove all the blank space, from up to down
             y = Main.BOARD_SIZE - 1;
@@ -138,7 +135,6 @@ class Model extends Observable {
                 }
             }
         }
-
         checkGameOver();
         if (changed) {
             setChanged();
@@ -149,9 +145,7 @@ class Model extends Observable {
     /** Return the current Tile at (COL, ROW), when sitting with the board
      *  oriented so that SIDE is at the top (farthest) from you. */
     private Tile vtile(int col, int row, Side side) {
-        if (_board[side.col(col, row, size())][side.row(col, row, size())] != null)
         return _board[side.col(col, row, size())][side.row(col, row, size())];
-        else return  null;
     }
 
     /** Move TILE to (COL, ROW), merging with any tile already there,
@@ -177,28 +171,28 @@ class Model extends Observable {
      *  accordingly. */
     private void checkGameOver() {
 //        check whether there are empty spaces in the board
-        for(int i = 0; i < Main.BOARD_SIZE; i++) {
-            for(int j = 0; j < Main.BOARD_SIZE; j++) {
+        for(int i = 0; i < Main.BOARD_SIZE; i++)
+            for(int j = 0; j < Main.BOARD_SIZE; j++)
                 if (tile(i, j) == null) return;
-            }
-        }
 
         /** If there are no empty spaces in the board, check whether there
          * are adjacency tiles with same value.   */
         for(int i = 0; i < Main.BOARD_SIZE; i++) {
             for(int j = 0; j < Main.BOARD_SIZE - 1; j++) {
-                if (tile(i,j) == tile(i, j+1) ) {
+                if (tile(i,j).value() == tile(i, j+1).value() ) {
                     return;
                 }
             }
         }
+
         for(int j = 0; j < Main.BOARD_SIZE; j++) {
             for (int i = 0; i< Main.BOARD_SIZE -1; i++) {
-                if (tile(i,j) == tile(i+1, j)) {
+                if (tile(i,j).value() == tile(i+1, j).value()) {
                     return;
                 }
             }
         }
+
         _maxScore = _score;
         _gameOver = true;
     }
