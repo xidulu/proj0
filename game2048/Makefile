@@ -9,7 +9,7 @@
 # Finally, you can run any tests you'd care to with
 #     make check
 
-SHELL = bash
+#SHELL = bash
 
 STYLEPROG = style61b
 

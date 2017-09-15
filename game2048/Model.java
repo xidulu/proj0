@@ -103,6 +103,7 @@ class Model extends Observable {
 //                element found could be merged with board(x,y)
                 if (vtile(x, y, side).value() == vtile(x,loc, side).value()) {
                     setVtile(x, loc, side, vtile(x, y, side));
+                    _score += vtile(x, loc, side).value();
                     changed = true;
                     y = loc + 1;
                     continue;
